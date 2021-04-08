@@ -1,0 +1,16 @@
+ul.ember-view.filters > li:not(.filter-group-heading ~ li) {
+  height: auto !important;
+}
+
+/*
+[href$="360088240092"],
+[href$="360108309851"],
+[href$="360111569292"],
+[href$="360112803832"],
+[href$="360114222731"],
+[href$="360115180871"],
+[href$="360115502072"],
+[href$="suspended"] {
+  display: none !important;
+}
+*/

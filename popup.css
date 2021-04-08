@@ -1,0 +1,17 @@
+body {
+  width: 600px;
+}
+
+div {
+  display: block;
+}
+
+.view-title {
+  display: inline-block;
+  width: 80%;
+}
+
+.view-button-wrapper {
+  display: inline-block;
+  width: 20%;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Zendesk View Extension 2.0",
+  "description": "Hides Zendesk views",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["scripting", "storage", "webNavigation"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://datadog.zendesk.com/agent/*"],
+      "run_at": "document_start",
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
+}
