@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   width: 600px;
 }
@@ -13,5 +17,28 @@ div {
 
 .view-button-wrapper {
   display: inline-block;
-  width: 20%;
+  padding: 2px;
+  width: 10%;
+}
+
+.view-button {
+  background-color: white;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  cursor: pointer;
+}
+
+.view-button.show {
+  border-color: green;
+  color: green;
+}
+
+.view-button.hide {
+  border-color: red;
+  color: red;
+}
+
+button:focus {
+  outline: none;
 }

@@ -3,7 +3,7 @@ console.log("content script!");
 const styleElement = document.createElement("style");
 styleElement.id = "extension-styles";
 styleElement.textContent = "";
-document.querySelector("html").append(styleElement); // try to append to head instead
+document.querySelector("html").append(styleElement); // try to append to head instead, also use document idle
 
 refreshState(); // reapply css rules from local storage
 observeViewChanges(); // only run if url is https://datadog.zendesk.com/agent/filters/* OR find event for changing tabs, also run on view refresh
@@ -22,7 +22,8 @@ function observeViewChanges() {
     }
   });
 
-  observer.observe(document.querySelector("html"), { // use attribute filter, look for other optimizations
+  observer.observe(document.querySelector("html"), {
+    // use attribute filter, look for other optimizations
     attributes: false,
     childList: true,
     characterData: false,
@@ -169,24 +170,15 @@ chrome.runtime.onConnect.addListener(function (port) {
     }
     console.log(ruleMapping);
     const id = msg.id;
-    chrome.storage.local.get(["views"], (value) => {
-      const views = value.views;
-      const displayed = views[id].displayed;
-      console.log(`displayed: ${displayed}`);
-      if (displayed) {
-        console.log("hide");
-        styleElement.sheet.insertRule(
-          `[href$="${id}"] { display: none !important;}`
-        );
-        views[id].displayed = false; // move to popup so can toggle off zendesk page
-      } else if (!displayed) {
-        console.log("show");
-        styleElement.sheet.deleteRule(ruleMapping[id]);
-        views[id].displayed = true; // move to popup so can toggle off zendesk page
-      }
-      console.log(styleElement.sheet.cssRules);
-      chrome.storage.local.set({ views: views }); // move to popup so can toggle off zendesk page
-    });
+    const action = msg.action;
+
+    if (action == "show") {
+      styleElement.sheet.deleteRule(ruleMapping[id]);
+    } else if (action == "hide") {
+      styleElement.sheet.insertRule(
+        `[href$="${id}"] { display: none !important;}`
+      );
+    }
   });
 });
 

@@ -8,10 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .forEach((view) => {
         const viewTitle = `<div class="view-title">${view.title}</div>`;
-        const button = `<div class="view-button-wrapper"><button id="${view.id}" class="view-button">Click!</button></div>`;
+        const showButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button show">Show!</button></div>`;
+        const hideButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button hide">Hide!</button></div>`;
         const viewWrapper = document.createElement("div");
-        viewWrapper.innerHTML = viewTitle + button;
-        viewWrapper.id = `view-${view.id}`;
+        viewWrapper.innerHTML = `${viewTitle}${showButton}${hideButton}`;
         viewWrapper.classList.add("view-wrapper");
         viewContainer.appendChild(viewWrapper);
       });
@@ -33,23 +33,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // send message to each Zendesk tab
     document.querySelectorAll(".view-button").forEach((button) => {
       button.addEventListener("click", (event) => {
-        ports.forEach((port) => {
-          port.postMessage({ id: event.target.id });
-        });
-      });
-    });
+        const viewId = event.target.getAttribute("view-id");
+        const action = event.target.classList.contains("show")
+          ? "show"
+          : "hide";
 
-    /*
-    document.querySelectorAll(".view-button").forEach((button) => {
-      button.addEventListener("click", (event) => {
         chrome.storage.local.get(["views"], (value) => {
           const views = value.views;
-          const id = event.target.id;
-          views[id].displayed = !views[id].displayed;
-          chrome.storage.local.set({ views: views });
+          const displayed = views[viewId].displayed;
+
+          var sendMessage = false;
+          if (action == "show" && !displayed) {
+            views[viewId].displayed = true;
+            sendMessage = true;
+          } else if (action == "hide" && displayed) {
+            views[viewId].displayed = false;
+            sendMessage = true;
+          }
+
+          // only send a message if a change occurred
+          if (sendMessage) {
+            chrome.storage.local.set({ views: views });
+            ports.forEach((port) => {
+              port.postMessage({ id: viewId, action: action });
+            });
+          }
         });
       });
     });
-*/
   });
 });
