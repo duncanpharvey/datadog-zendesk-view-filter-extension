@@ -16,12 +16,24 @@ document.addEventListener("DOMContentLoaded", () => {
         viewContainer.appendChild(viewWrapper);
       });
 
-    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-      const port = chrome.tabs.connect(tabs[0].id, {
-        name: "content connection",
-      });
-      document.querySelectorAll(".view-button").forEach((button) => {
-        button.addEventListener("click", (event) => {
+    // open port for each Zendesk tab
+    var ports = [];
+    chrome.tabs.query(
+      { url: "https://datadog.zendesk.com/agent/*" },
+      function (tabs) {
+        tabs.forEach((tab) => {
+          const port = chrome.tabs.connect(tab.id, {
+            name: `connection for tab id: ${tab.id}`,
+          });
+          ports.push(port);
+        });
+      }
+    );
+
+    // send message to each Zendesk tab
+    document.querySelectorAll(".view-button").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        ports.forEach((port) => {
           port.postMessage({ id: event.target.id });
         });
       });
