@@ -39,6 +39,16 @@ div {
   color: red;
 }
 
+.view-button.show[selected="true"] {
+  background-color: green;
+  color: white;
+}
+
+.view-button.hide[selected="true"] {
+  background-color: red;
+  color: white;
+}
+
 button:focus {
   outline: none;
 }

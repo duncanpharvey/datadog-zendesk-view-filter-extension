@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .forEach((view) => {
         const viewTitle = `<div class="view-title">${view.title}</div>`;
-        const showButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button show">Show!</button></div>`;
-        const hideButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button hide">Hide!</button></div>`;
+        const showButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button show" selected=${view.displayed ? true : false}>Show!</button></div>`;
+        const hideButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button hide" selected=${view.displayed ? false : true}>Hide!</button></div>`;
         const viewWrapper = document.createElement("div");
         viewWrapper.innerHTML = `${viewTitle}${showButton}${hideButton}`;
         viewWrapper.classList.add("view-wrapper");
@@ -38,16 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
           ? "show"
           : "hide";
 
+        const showButton = document.querySelector(`.view-button.show[view-id="${viewId}"]`);
+        const hideButton = document.querySelector(`.view-button.hide[view-id="${viewId}"]`);
         chrome.storage.local.get(["views"], (value) => {
           const views = value.views;
           const displayed = views[viewId].displayed;
 
+          // update to toggle state regardless of which button is clicked
           var sendMessage = false;
           if (action == "show" && !displayed) {
             views[viewId].displayed = true;
+            showButton.setAttribute("selected", true);
+            hideButton.setAttribute("selected", false);
             sendMessage = true;
           } else if (action == "hide" && displayed) {
             views[viewId].displayed = false;
+            showButton.setAttribute("selected", false);
+            hideButton.setAttribute("selected", true);
             sendMessage = true;
           }
 
