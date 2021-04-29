@@ -19,9 +19,8 @@ async function createExtensionUI() {
         viewWrapper.innerHTML = `${viewTitle}${showButton}${hideButton}`;
         viewWrapper.classList.add("view-wrapper");
         viewContainer.appendChild(viewWrapper);
-
-        createButtonEventListeners();
       });
+    createButtonEventListeners();
     console.log("UI finished");
   });
 }
@@ -46,7 +45,6 @@ function createButtonEventListeners() {
   const ports = openMessagePorts();
   // send message to each Zendesk tab
   document.querySelectorAll(".view-button").forEach((button) => {
-    console.log("testing");
     button.addEventListener("click", (event) => {
       const viewId = event.target.getAttribute("view-id");
       const action = event.target.classList.contains("show") ? "show" : "hide";
