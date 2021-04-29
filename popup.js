@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  createExtensionUI();
+});
+
+async function createExtensionUI() {
+  console.log("create UI");
   chrome.storage.local.get(["views"], (value) => {
     const views = value.views;
     const viewContainer = document.getElementById("view-container");
@@ -14,59 +19,67 @@ document.addEventListener("DOMContentLoaded", () => {
         viewWrapper.innerHTML = `${viewTitle}${showButton}${hideButton}`;
         viewWrapper.classList.add("view-wrapper");
         viewContainer.appendChild(viewWrapper);
+
+        createButtonEventListeners();
       });
+    console.log("UI finished");
+  });
+}
 
-    // open port for each Zendesk tab
-    var ports = [];
-    chrome.tabs.query(
-      { url: "https://datadog.zendesk.com/agent/*" },
-      function (tabs) {
-        tabs.forEach((tab) => {
-          const port = chrome.tabs.connect(tab.id, {
-            name: `connection for tab id: ${tab.id}`,
+function openMessagePorts() {
+  // open port for each Zendesk tab
+  var ports = [];
+  chrome.tabs.query(
+    { url: "https://datadog.zendesk.com/agent/*" },
+    function (tabs) {
+      tabs.forEach((tab) => {
+        const port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
+        ports.push(port);
+      });
+    }
+  );
+  return ports;
+}
+
+function createButtonEventListeners() {
+  console.log("create event listeners");
+  const ports = openMessagePorts();
+  // send message to each Zendesk tab
+  document.querySelectorAll(".view-button").forEach((button) => {
+    console.log("testing");
+    button.addEventListener("click", (event) => {
+      const viewId = event.target.getAttribute("view-id");
+      const action = event.target.classList.contains("show") ? "show" : "hide";
+
+      const showButton = document.querySelector(`.view-button.show[view-id="${viewId}"]`);
+      const hideButton = document.querySelector(`.view-button.hide[view-id="${viewId}"]`);
+      chrome.storage.local.get(["views"], (value) => {
+        const views = value.views;
+        const displayed = views[viewId].displayed;
+
+        // update to toggle state regardless of which button is clicked
+        var sendMessage = false;
+        if (action == "show" && !displayed) {
+          views[viewId].displayed = true;
+          showButton.setAttribute("selected", true);
+          hideButton.setAttribute("selected", false);
+          sendMessage = true;
+        } else if (action == "hide" && displayed) {
+          views[viewId].displayed = false;
+          showButton.setAttribute("selected", false);
+          hideButton.setAttribute("selected", true);
+          sendMessage = true;
+        }
+
+        // only send a message if a change occurred
+        if (sendMessage) {
+          chrome.storage.local.set({ views: views });
+          ports.forEach((port) => {
+            console.log(`posting message to ${port}`);
+            port.postMessage({ id: viewId, action: action });
           });
-          ports.push(port);
-        });
-      }
-    );
-
-    // send message to each Zendesk tab
-    document.querySelectorAll(".view-button").forEach((button) => {
-      button.addEventListener("click", (event) => {
-        const viewId = event.target.getAttribute("view-id");
-        const action = event.target.classList.contains("show")
-          ? "show"
-          : "hide";
-
-        const showButton = document.querySelector(`.view-button.show[view-id="${viewId}"]`);
-        const hideButton = document.querySelector(`.view-button.hide[view-id="${viewId}"]`);
-        chrome.storage.local.get(["views"], (value) => {
-          const views = value.views;
-          const displayed = views[viewId].displayed;
-
-          // update to toggle state regardless of which button is clicked
-          var sendMessage = false;
-          if (action == "show" && !displayed) {
-            views[viewId].displayed = true;
-            showButton.setAttribute("selected", true);
-            hideButton.setAttribute("selected", false);
-            sendMessage = true;
-          } else if (action == "hide" && displayed) {
-            views[viewId].displayed = false;
-            showButton.setAttribute("selected", false);
-            hideButton.setAttribute("selected", true);
-            sendMessage = true;
-          }
-
-          // only send a message if a change occurred
-          if (sendMessage) {
-            chrome.storage.local.set({ views: views });
-            ports.forEach((port) => {
-              port.postMessage({ id: viewId, action: action });
-            });
-          }
-        });
+        }
       });
     });
   });
-});
+}

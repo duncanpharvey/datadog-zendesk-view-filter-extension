@@ -11,9 +11,7 @@ observeViewChanges(); // only run if url is https://datadog.zendesk.com/agent/fi
 function observeViewChanges() {
   console.log("observing view changes");
   var observer = new MutationObserver(() => {
-    var viewList = document.querySelectorAll(
-      '[data-test-id="views_views-list_general-views-container"] > a > [data-test-id="views_views-list_row_title"]'
-    );
+    var viewList = document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a > [data-test-id="views_views-list_row_title"]');
     if (viewList.length >= 12) {
       console.log("view changes found");
       observer.disconnect();
@@ -38,9 +36,7 @@ function syncViews() {
     const views = value.views;
     console.log(`views: ${JSON.stringify(views)}`);
     document
-      .querySelectorAll(
-        '[data-test-id="views_views-list_general-views-container"] > a'
-      )
+      .querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a')
       .forEach((view) => {
         const id = view.getAttribute("href").match(/[^\/]+$/)[0];
 
@@ -63,64 +59,6 @@ function syncViews() {
   });
 }
 
-/*
-function listenForUpdates() {
-  console.log("listening");
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    // why is this getting called when everything is initialized?
-    console.log("updating views");
-    document.querySelectorAll(".custom-extension-views").forEach((view) => {
-      const id = view.getAttribute("view-id");
-      const newDisplayStatus = changes.views.newValue[id].displayed;
-      if (view.classList.contains("hide-view") && newDisplayStatus) {
-        view.classList.remove("hide-view");
-      } else if (!view.classList.contains("hide-view") && !newDisplayStatus) {
-        view.classList.add("hide-view");
-      }
-    });
-  });
-  console.log("added");
-}
-
-function listenForUpdates2() {
-  console.log("listening 2");
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    // why is this getting called when everything is initialized?
-    console.log("updating views 2");
-    const styleElement = document.getElementById("extension-styles");
-
-    const rules = styleElement.sheet.cssRules;
-    const ruleMapping = {};
-    for (let i = 0; i < rules.length; i++) {
-      const rule = rules[i];
-      const id = rule.selectorText.match(/"([^"]+)"/)[1];
-      ruleMapping[id] = i;
-    }
-
-    document
-      .querySelectorAll(
-        "ul.ember-view.filters > li:not(.filter-group-heading ~ li)"
-      )
-      .forEach((view) => {
-        const id = view.firstElementChild
-          .getAttribute("href")
-          .match(/[^\/]+$/)[0];
-        const displayed = changes.views.newValue[id].displayed;
-        if (!(id in ruleMapping) && !displayed) {
-          styleElement.sheet.insertRule(
-            `[href$="${id}"] { display: none !important;}`
-          );
-        } else if (id in ruleMapping && displayed) {
-          console.log("deleting");
-          console.log(id);
-          styleElement.sheet.deleteRule(ruleMapping[id]);
-        }
-      });
-  });
-  console.log("added 2");
-}
-*/
-
 function refreshState() {
   chrome.storage.local.get(["views"], (value) => {
     const views = value.views;
@@ -131,9 +69,7 @@ function refreshState() {
         console.log(styleElement.sheet.cssRules);
         console.log("hiding");
         console.log(id);
-        styleElement.sheet.insertRule(
-          `[href$="${id}"] { display: none !important;}`
-        );
+        styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
         console.log(styleElement.sheet.cssRules);
       }
     });
@@ -161,46 +97,7 @@ chrome.runtime.onConnect.addListener(function (port) {
     if (action == "show") {
       styleElement.sheet.deleteRule(ruleMapping[id]);
     } else if (action == "hide") {
-      styleElement.sheet.insertRule(
-        `[href$="${id}"] { display: none !important;}`
-      );
+      styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
     }
   });
 });
-
-/*
-function listenForRefresh() {
-  var port = chrome.runtime.connect({ name: "mycontentscript" }); // open connection with service worker
-  port.onMessage.addListener(function (message, sender) {
-    if (message.sync) {
-      console.log("message received");
-      // syncViews(); // get new views if available
-
-      // create stylesheet from storage
-      chrome.storage.local.get(["views"], (value) => {
-        const views = value.views;
-        console.log(views);
-
-        document
-          .querySelectorAll(
-            "ul.ember-view.filters > li:not(.filter-group-heading ~ li)"
-          )
-          .forEach((view) => {
-            const id = view.firstElementChild
-              .getAttribute("href")
-              .match(/[^\/]+$/)[0];
-
-            const displayed = views[id].displayed;
-            if (!displayed) {
-              console.log("hiding");
-              console.log(id);
-              styleElement.sheet.insertRule(
-                `[href$="${id}"] { display: none !important;}`
-              );
-            }
-          });
-      });
-    }
-  });
-}
-*/
