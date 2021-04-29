@@ -12,7 +12,7 @@ function observeViewChanges() {
   console.log("observing view changes");
   var observer = new MutationObserver(() => {
     var viewList = document.querySelectorAll(
-      "ul.ember-view.filters > li > a > span"
+      '[data-test-id="views_views-list_general-views-container"] > a > [data-test-id="views_views-list_row_title"]'
     );
     if (viewList.length >= 12) {
       console.log("view changes found");
@@ -39,29 +39,15 @@ function syncViews() {
     console.log(`views: ${JSON.stringify(views)}`);
     document
       .querySelectorAll(
-        "ul.ember-view.filters > li:not(.filter-group-heading ~ li)"
+        '[data-test-id="views_views-list_general-views-container"] > a'
       )
       .forEach((view) => {
-        const linkElement = view.firstElementChild;
-        const id = linkElement.getAttribute("href").match(/[^\/]+$/)[0];
+        const id = view.getAttribute("href").match(/[^\/]+$/)[0];
 
-        /*
-        if (!view.classList.contains("custom-extension-views")) {
-          view.classList.add("custom-extension-views");
-          view.setAttribute("view-id", id);
-        }
-        */
-
-        console.log(id);
-        console.log(Object.keys(views));
         const viewIds = new Set(Object.keys(views));
         if (viewIds.has(id)) return;
-        console.log("continued");
 
-        const title = linkElement.innerText
-          .replace(/(\r\n|\n|\r)/gm, "") // remove carriage returns
-          .replace(/[0-9]+$/, "") // remove number of tickets in view
-          .trim(); // remove whitespaces
+        const title = view.firstElementChild.innerText;
 
         views[id] = {
           id: id,
