@@ -68,4 +68,4 @@ async function createButtonEventListeners() {
 // close extension UI if new window is focused on
 chrome.windows.onFocusChanged.addListener(() => {
   window.close();
-});
+}, { windowTypes: ['normal'] });
