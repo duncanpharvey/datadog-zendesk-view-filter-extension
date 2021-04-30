@@ -1,6 +1,6 @@
 // listen for update messages from extension
-chrome.runtime.onConnect.addListener(function (port) {
-    port.onMessage.addListener(function (msg) {
+chrome.runtime.onConnect.addListener(port =>  {
+    port.onMessage.addListener(msg => {
         const styleElement = document.getElementById("extension-styles");
         const rules = styleElement.sheet.cssRules;
         const ruleMapping = {};
@@ -13,8 +13,16 @@ chrome.runtime.onConnect.addListener(function (port) {
         const action = msg.action;
 
         if (action == "show") {
+            if (!(id in ruleMapping)) {
+                console.log("no rule to delete");
+                return;
+            }
             styleElement.sheet.deleteRule(ruleMapping[id]);
         } else if (action == "hide") {
+            if (id in ruleMapping) {
+                console.log("rule already exists");
+                return;
+            }
             styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
         }
     });

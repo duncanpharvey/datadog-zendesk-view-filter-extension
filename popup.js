@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function createExtensionUI() {
-  chrome.storage.local.get(["views"], (value) => {
+  chrome.storage.local.get(["views"], value => {
     const views = value.views;
     if (Object.values(views).length == 0) {
       const messageContainer = document.getElementById("message-container");
@@ -27,7 +27,7 @@ function createExtensionUI() {
 
 // open port for current tab if Zendesk
 async function openMessagePort() {
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true, url: "https://datadog.zendesk.com/agent/*" });
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true, url: "https://datadog.zendesk.com/agent/*" });
   if (!tab) return;
   const port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
   return port;
@@ -36,13 +36,13 @@ async function openMessagePort() {
 async function createButtonEventListeners() {
   const port = await openMessagePort();
   document.querySelectorAll(".view-button").forEach((button) => {
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", event => {
       const viewId = event.target.getAttribute("view-id");
       const action = event.target.classList.contains("show") ? "show" : "hide";
 
       const showButton = document.querySelector(`.view-button.show[view-id="${viewId}"]`);
       const hideButton = document.querySelector(`.view-button.hide[view-id="${viewId}"]`);
-      chrome.storage.local.get(["views"], (value) => {
+      chrome.storage.local.get(["views"], value => {
         const views = value.views;
         const displayed = views[viewId].displayed;
 
@@ -64,3 +64,8 @@ async function createButtonEventListeners() {
     });
   });
 }
+
+// close extension UI if new window is focused on
+chrome.windows.onFocusChanged.addListener(() => {
+  window.close();
+});

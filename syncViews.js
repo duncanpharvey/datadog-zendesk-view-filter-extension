@@ -28,9 +28,9 @@ function observeViewUpdates() {
 // TODO: test if works correctly when views are added/removed
 function syncViews() {
   var internalId = 1; // used for sorting
-  chrome.storage.local.get(["views"], (value) => {
+  chrome.storage.local.get(["views"], value => {
     const views = value.views;
-    document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a').forEach((view) => {
+    document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a').forEach(view => {
       const id = view.getAttribute("href").match(/[^\/]+$/)[0];
 
       const viewIds = new Set(Object.keys(views));
