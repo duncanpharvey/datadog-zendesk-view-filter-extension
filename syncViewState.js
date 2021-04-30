@@ -14,9 +14,9 @@ function syncViewState() {
     while (styleElement.sheet.cssRules.length > 0) {
         styleElement.sheet.deleteRule(0);
     }
-    chrome.storage.local.get(["views"], (value) => {
+    chrome.storage.local.get(["views"], value => {
         const views = value.views;
-        Object.keys(views).forEach((id) => {
+        Object.keys(views).forEach(id => {
             const view = views[id];
             if (!view.displayed) {
                 styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
