@@ -2,8 +2,7 @@ console.log("content script!");
 
 const styleElement = document.createElement("style");
 styleElement.id = "extension-styles";
-styleElement.textContent = "";
-document.querySelector("html").append(styleElement); // try to append to head instead, also use document idle
+document.querySelector("head").append(styleElement);
 
 refreshState(); // reapply css rules from local storage
 observeViewChanges(); // only run if url is https://datadog.zendesk.com/agent/filters/* OR find event for changing tabs, also run on view refresh
