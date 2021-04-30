@@ -52,3 +52,7 @@ div {
 button:focus {
   outline: none;
 }
+
+#message-container {
+  display: none;
+}

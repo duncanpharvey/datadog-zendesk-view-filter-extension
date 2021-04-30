@@ -6,16 +6,31 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["scripting", "storage", "webNavigation", "tabs"],
+  "permissions": [
+    "scripting",
+    "storage",
+    "tabs"
+  ],
   "action": {
     "default_popup": "popup.html"
   },
+  "host_permissions": [
+    "https://datadog.zendesk.com/agent/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://datadog.zendesk.com/agent/*"],
+      "matches": [
+        "https://datadog.zendesk.com/agent/*"
+      ],
       "run_at": "document_idle",
-      "js": ["content.js"],
-      "css": ["content.css"]
+      "js": [
+        "listenForViewUpdates.js",
+        "syncViews.js",
+        "syncViewState.js"
+      ],
+      "css": [
+        "content.css"
+      ]
     }
   ]
 }
