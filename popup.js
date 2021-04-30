@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function createExtensionUI() {
-  console.log("create UI");
   chrome.storage.local.get(["views"], (value) => {
     const views = value.views;
     const viewContainer = document.getElementById("view-container");
@@ -21,7 +20,6 @@ async function createExtensionUI() {
         viewContainer.appendChild(viewWrapper);
       });
     createButtonEventListeners();
-    console.log("UI finished");
   });
 }
 
@@ -41,7 +39,6 @@ function openMessagePorts() {
 }
 
 function createButtonEventListeners() {
-  console.log("create event listeners");
   const ports = openMessagePorts();
   // send message to each Zendesk tab
   document.querySelectorAll(".view-button").forEach((button) => {
@@ -73,7 +70,6 @@ function createButtonEventListeners() {
         if (sendMessage) {
           chrome.storage.local.set({ views: views });
           ports.forEach((port) => {
-            console.log(`posting message to ${port}`);
             port.postMessage({ id: viewId, action: action });
           });
         }
