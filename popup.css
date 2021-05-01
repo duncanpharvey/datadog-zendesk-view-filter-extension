@@ -4,14 +4,31 @@
 
 body {
   width: 600px;
+  background-color:rgba(100,44,165,0.2);
 }
 
 div {
   display: block;
 }
 
+hr {
+  border-style: solid;
+  border-color: #642CA5;
+}
+
+.view-header {
+  font-size: 18px;
+  font-weight: 500;
+  padding: 6px;
+}
+
+.view-wrapper {
+  height: 24px;
+}
+
 .view-title {
   display: inline-block;
+  font-size: 12px;
   width: 80%;
 }
 
@@ -30,22 +47,22 @@ div {
 }
 
 .view-button.show {
-  border-color: green;
-  color: green;
+  border-color: #2E8B57;
+  color: #2E8B57;
 }
 
 .view-button.hide {
-  border-color: red;
-  color: red;
+  border-color: #FF4500;
+  color: #FF4500;
 }
 
 .view-button.show[selected="true"] {
-  background-color: green;
+  background-color: #2E8B57;
   color: white;
 }
 
 .view-button.hide[selected="true"] {
-  background-color: red;
+  background-color: #FF4500;
   color: white;
 }
 
