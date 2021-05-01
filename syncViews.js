@@ -1,3 +1,5 @@
+console.log("running syncViews.js");
+
 const views = document.querySelector('[data-test-id="views_views-list_general-views-container"] > a');
 
 if (views) {
@@ -8,9 +10,11 @@ else {
 }
 
 function observeViewUpdates() {
+  console.log("observing view updates");
   var observer = new MutationObserver(() => {
     var viewList = document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a > [data-test-id="views_views-list_row_title"]');
     if (viewList.length >= 12) {
+      console.log(`found ${viewList.length} views`);
       observer.disconnect();
       syncViews();
     }
@@ -27,6 +31,7 @@ function observeViewUpdates() {
 
 // TODO: test if works correctly when views are added/removed
 function syncViews() {
+  console.log("syncing views");
   var internalId = 1; // used for sorting
   chrome.storage.local.get(["views"], value => {
     const views = value.views;

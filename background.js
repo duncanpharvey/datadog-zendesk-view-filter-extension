@@ -1,6 +1,6 @@
 // on extension installation initialize local view storage, get views from open Zendesk tabs, and listen for view updates
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.set({ views: {} });
+  chrome.storage.local.set({ views: {} }); // TODO: look to see if there are existing rules?
 
   chrome.tabs.query({ url: "https://datadog.zendesk.com/agent/*" }, tabs => {
     tabs.forEach(tab => {

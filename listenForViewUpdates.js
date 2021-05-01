@@ -1,8 +1,13 @@
+console.log("running listenForViewUpdates.js");
+
 // listen for update messages from extension
-chrome.runtime.onConnect.addListener(port =>  {
+chrome.runtime.onConnect.addListener(port => {
+    console.log(`listening for view updates on port: ${port.name}`);
     port.onMessage.addListener(msg => {
+        console.log(`received ${msg.action} message for view: ${msg.id}`);
         const styleElement = document.getElementById("extension-styles");
         const rules = styleElement.sheet.cssRules;
+
         const ruleMapping = {};
         for (let i = 0; i < rules.length; i++) {
             const rule = rules[i];
@@ -14,15 +19,17 @@ chrome.runtime.onConnect.addListener(port =>  {
 
         if (action == "show") {
             if (!(id in ruleMapping)) {
-                console.log("no rule to delete");
+                console.log(`no rule to delete for view: ${id}`);
                 return;
             }
+            console.log(`listenForViewUpdates: removing rule for view: ${id}`);
             styleElement.sheet.deleteRule(ruleMapping[id]);
         } else if (action == "hide") {
             if (id in ruleMapping) {
-                console.log("rule already exists");
+                console.log(`rule already exists for view: ${id}`);
                 return;
             }
+            console.log(`listenForViewUpdates: adding rule for view: ${id}`);
             styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
         }
     });
