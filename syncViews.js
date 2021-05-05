@@ -22,9 +22,7 @@ function observeViewUpdates() {
 
   // TODO: use attribute filter, look for other optimizations. https://stackoverflow.com/questions/31659567/performance-of-mutationobserver-to-detect-nodes-in-entire-dom/39332340
   observer.observe(document, {
-    attributes: false,
     childList: true,
-    characterData: false,
     subtree: true,
   });
 }
@@ -71,5 +69,6 @@ function syncViews() {
       internalId++;
     });
     chrome.storage.local.set({ views: views });
+    chrome.runtime.sendMessage({ synced: true });
   });
 }

@@ -11,19 +11,18 @@ function createLoadingAnimation() {
 }
 
 function createExtensionUI(port) {
+  document.body.removeChild(document.getElementById("loader"));
   chrome.storage.local.get(["views"], value => {
     const views = value.views;
-    if (Object.values(views).length == 0) {
-      const messageContainer = document.getElementById("message-container");
-      messageContainer.style.display = "block";
-      return;
-    }
     const viewContainer = document.getElementById("view-container");
     const viewHeaderWrapper = document.createElement("div");
     viewHeaderWrapper.classList.add("view-header-wrapper");
     viewHeaderWrapper.innerHTML = `<div class="view-header">Select Zendesk views to hide</div><hr>`;
-    document.body.removeChild(document.getElementById("loader"));
     viewContainer.appendChild(viewHeaderWrapper);
+    if (Object.values(views).length == 0) {
+      document.getElementById("message-container").style.display = "block";
+      return;
+    }
     Object.values(views).filter(view => { return view.active; }).sort((a, b) => { return a.internalId - b.internalId; })
       .forEach(view => {
         const viewTitle = `<div class="view-title-wrapper"><span class="view-title">${view.title}</span></div>`;
@@ -46,10 +45,20 @@ async function openMessagePort() {
   }
   // wait for page to load if not loaded yet
   else if (tab.status != "complete") {
+    var listening = false;
+    var synced = false;
+    var port;
     chrome.runtime.onMessage.addListener(request => {
-      if (!request.listening) return;
-      var port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-      createExtensionUI(port);
+      if (request.listening) {
+        listening = true;
+        port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
+      }
+      if (request.synced) {
+        synced = true;
+      }
+      if (listening && synced && port) {
+        createExtensionUI(port);
+      }
     });
   }
   // open port if page is already loaded
