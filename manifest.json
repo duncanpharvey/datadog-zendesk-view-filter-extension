@@ -1,8 +1,13 @@
 {
-  "name": "Zendesk View Extension 2.0",
-  "description": "Hides Zendesk views",
+  "name": "Zendesk View Filter for Datadog",
+  "description": "Allows selectively hiding Zendesk views in Datadog environment",
   "version": "1.0",
   "manifest_version": 3,
+  "icons": {
+    "16": "icons/zendesk-view-filter-16.png",
+    "48": "icons/zendesk-view-filter-48.png",
+    "128": "icons/zendesk-view-filter-128.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -27,9 +32,6 @@
         "listenForViewUpdates.js",
         "syncViews.js",
         "syncViewState.js"
-      ],
-      "css": [
-        "content.css"
       ]
     }
   ]
