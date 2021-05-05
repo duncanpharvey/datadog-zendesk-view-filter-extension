@@ -28,20 +28,20 @@ hr {
 
 .view-wrapper {
   height: 100%;
+  padding: 4px;
 }
 
-.view-title {
+.view-title-wrapper {
   display: inline-block;
   font-size: 12px;
-  margin: 4px;
-  width: 80%;
+  padding-left: 4px;
   vertical-align: middle;
+  width: 92%;
 }
 
 .view-toggle-wrapper {
   display: inline-block;
-  padding: 2px;
-  width: 10%;
+  width: 8%;
 }
 
 .toggle {

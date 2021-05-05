@@ -17,8 +17,8 @@ function createExtensionUI() {
     viewContainer.appendChild(viewHeaderWrapper);
     Object.values(views).sort((a, b) => { return a.internalId - b.internalId; })
       .forEach(view => {
-        const viewTitle = `<div class="view-title">${view.title}</div>`;
-        const checkbox = `<input id="view-${view.id}" view-id="${view.id}" type="checkbox" class="checkbox"><label for="view-${view.id}" class="toggle"></label>`;
+        const viewTitle = `<div class="view-title-wrapper"><span class="view-title">${view.title}</span></div>`;
+        const checkbox = `<div class="view-toggle-wrapper"><input id="view-${view.id}" view-id="${view.id}" type="checkbox" class="checkbox"><label for="view-${view.id}" class="toggle"></label></div>`;
         const viewWrapper = document.createElement("div");
         viewWrapper.innerHTML = `${checkbox}${viewTitle}`;
         viewWrapper.classList.add("view-wrapper");
