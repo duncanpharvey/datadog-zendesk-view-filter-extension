@@ -20,7 +20,6 @@ function observeViewUpdates() {
     }
   });
 
-  // TODO: use attribute filter, look for other optimizations. https://stackoverflow.com/questions/31659567/performance-of-mutationobserver-to-detect-nodes-in-entire-dom/39332340
   observer.observe(document, {
     childList: true,
     subtree: true,
@@ -43,6 +42,7 @@ function syncViews() {
     });
 
     document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a').forEach(view => {
+      if (view.style.display == "none") return; // skip views that are already not displayed by Zendesk
       const id = view.getAttribute("data-view-id");
       const title = view.firstElementChild.innerText;
 
