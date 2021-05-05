@@ -29,7 +29,6 @@
       ],
       "run_at": "document_idle",
       "js": [
-        "listenForViewUpdates.js",
         "syncViews.js",
         "syncViewState.js"
       ]

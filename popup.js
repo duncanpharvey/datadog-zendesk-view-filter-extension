@@ -45,18 +45,9 @@ async function openMessagePort() {
   }
   // wait for page to load if not loaded yet
   else if (tab.status != "complete") {
-    var listening = false;
-    var synced = false;
-    var port;
     chrome.runtime.onMessage.addListener(request => {
       if (request.listening) {
-        listening = true;
         port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-      }
-      if (request.synced) {
-        synced = true;
-      }
-      if (listening && synced && port) {
         createExtensionUI(port);
       }
     });
