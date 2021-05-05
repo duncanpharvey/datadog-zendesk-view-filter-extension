@@ -1,7 +1,7 @@
 {
   "name": "Zendesk View Filter for Datadog",
   "description": "Allows selectively hiding Zendesk views in Datadog environment",
-  "version": "1.0",
+  "version": "1.0.0",
   "manifest_version": 3,
   "icons": {
     "16": "icons/zendesk-view-filter-16.png",
