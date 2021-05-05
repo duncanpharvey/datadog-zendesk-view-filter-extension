@@ -33,10 +33,13 @@ hr {
 
 .view-title-wrapper {
   display: inline-block;
-  font-size: 12px;
   padding-left: 4px;
   vertical-align: middle;
   width: 92%;
+}
+
+.view-title {
+  font-size: 12px;
 }
 
 .view-toggle-wrapper {
