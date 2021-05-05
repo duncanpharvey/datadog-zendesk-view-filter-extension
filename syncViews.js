@@ -6,7 +6,7 @@ if (views) {
   syncViews();
 }
 else {
-  observeViewUpdates(); // TODO: also run when view refresh button is pressed
+  observeViewUpdates(); // TODO: also run when view refresh button is pressed - must wait for new views to load
 }
 
 function observeViewUpdates() {
