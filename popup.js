@@ -18,14 +18,14 @@ function createExtensionUI() {
     Object.values(views).sort((a, b) => { return a.internalId - b.internalId; })
       .forEach(view => {
         const viewTitle = `<div class="view-title">${view.title}</div>`;
-        const showButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button show" selected=${view.displayed ? true : false}>Show</button></div>`;
-        const hideButton = `<div class="view-button-wrapper"><button view-id="${view.id}" class="view-button hide" selected=${view.displayed ? false : true}>Hide</button></div>`;
+        const checkbox = `<input id="view-${view.id}" view-id="${view.id}" type="checkbox" class="checkbox"><label for="view-${view.id}" class="toggle"></label>`;
         const viewWrapper = document.createElement("div");
-        viewWrapper.innerHTML = `${showButton}${hideButton}${viewTitle}`;
+        viewWrapper.innerHTML = `${checkbox}${viewTitle}`;
         viewWrapper.classList.add("view-wrapper");
         viewContainer.appendChild(viewWrapper);
+        document.getElementById(`view-${view.id}`).checked = view.displayed;
       });
-    createButtonEventListeners();
+    createCheckboxEventListeners();
   });
 }
 
@@ -37,29 +37,25 @@ async function openMessagePort() {
   return port;
 }
 
-async function createButtonEventListeners() {
+async function createCheckboxEventListeners() {
   const port = await openMessagePort();
-  document.querySelectorAll(".view-button").forEach(button => {
-    button.addEventListener("click", event => {
+  document.querySelectorAll(".checkbox").forEach(checkbox => {
+    checkbox.addEventListener("change", event => {
       const viewId = event.target.getAttribute("view-id");
+      const checked = event.target.checked;
 
-      const showButton = document.querySelector(`.view-button.show[view-id="${viewId}"]`);
-      const hideButton = document.querySelector(`.view-button.hide[view-id="${viewId}"]`);
       chrome.storage.local.get(["views"], value => {
         const views = value.views;
         const displayed = views[viewId].displayed;
 
-        if (!displayed) {
+        if (checked && !displayed) {
           views[viewId].displayed = true;
           chrome.storage.local.set({ views: views });
-          showButton.setAttribute("selected", true);
-          hideButton.setAttribute("selected", false);
           if (port) port.postMessage({ id: viewId, action: "show" });
-        } else if (displayed) {
+        }
+        else if (!checked && displayed) {
           views[viewId].displayed = false;
           chrome.storage.local.set({ views: views });
-          showButton.setAttribute("selected", false);
-          hideButton.setAttribute("selected", true);
           if (port) port.postMessage({ id: viewId, action: "hide" });
         }
       });
