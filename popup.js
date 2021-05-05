@@ -1,9 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
-  createExtensionUI();
+  createLoadingAnimation();
   openMessagePort();
 });
 
-function createExtensionUI() {
+function createLoadingAnimation() {
+  const loader = document.createElement("div");
+  loader.id = "loader";
+  loader.innerHTML = `<div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
+  document.body.appendChild(loader);
+}
+
+function createExtensionUI(port) {
   chrome.storage.local.get(["views"], value => {
     const views = value.views;
     if (Object.values(views).length == 0) {
@@ -15,6 +22,7 @@ function createExtensionUI() {
     const viewHeaderWrapper = document.createElement("div");
     viewHeaderWrapper.classList.add("view-header-wrapper");
     viewHeaderWrapper.innerHTML = `<div class="view-header">Select Zendesk views to hide</div><hr>`;
+    document.body.removeChild(document.getElementById("loader"));
     viewContainer.appendChild(viewHeaderWrapper);
     Object.values(views).filter(view => { return view.active; }).sort((a, b) => { return a.internalId - b.internalId; })
       .forEach(view => {
@@ -26,26 +34,28 @@ function createExtensionUI() {
         viewContainer.appendChild(viewWrapper);
         document.getElementById(`view-${view.id}`).checked = view.displayed;
       });
+    createCheckboxEventListeners(port);
   });
 }
 
 // open port for current tab if Zendesk
 async function openMessagePort() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true, url: "https://datadog.zendesk.com/agent/*" });
-  if (!tab) return null;
-
+  if (!tab) {
+    createExtensionUI(null);
+  }
   // wait for page to load if not loaded yet
-  if (tab.status != "complete") {
+  else if (tab.status != "complete") {
     chrome.runtime.onMessage.addListener(request => {
       if (!request.listening) return;
       var port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-      createCheckboxEventListeners(port);
+      createExtensionUI(port);
     });
   }
   // open port if page is already loaded
   else {
     var port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-    createCheckboxEventListeners(port);
+    createExtensionUI(port);
   }
 }
 
