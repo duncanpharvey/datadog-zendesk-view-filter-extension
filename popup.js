@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   createExtensionUI();
+  openMessagePort();
 });
 
 function createExtensionUI() {
@@ -25,7 +26,6 @@ function createExtensionUI() {
         viewContainer.appendChild(viewWrapper);
         document.getElementById(`view-${view.id}`).checked = view.displayed;
       });
-    createCheckboxEventListeners();
   });
 }
 
@@ -33,12 +33,23 @@ function createExtensionUI() {
 async function openMessagePort() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true, url: "https://datadog.zendesk.com/agent/*" });
   if (!tab) return null;
-  const port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-  return port;
+
+  // wait for page to load if not loaded yet
+  if (tab.status != "complete") {
+    chrome.runtime.onMessage.addListener(request => {
+      if (!request.listening) return;
+      var port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
+      createCheckboxEventListeners(port);
+    });
+  }
+  // open port if page is already loaded
+  else {
+    var port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
+    createCheckboxEventListeners(port);
+  }
 }
 
-async function createCheckboxEventListeners() {
-  const port = await openMessagePort();
+function createCheckboxEventListeners(port) {
   document.querySelectorAll(".checkbox").forEach(checkbox => {
     checkbox.addEventListener("change", event => {
       const viewId = event.target.getAttribute("view-id");

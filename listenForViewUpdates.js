@@ -1,7 +1,5 @@
 console.log("running listenForViewUpdates.js");
 
-// TODO: fix issue when opening zendesk extension as Zendesk page is loading
-// listen for update messages from extension
 chrome.runtime.onConnect.addListener(port => {
     console.log(`listening for view updates on port: ${port.name}`);
     port.onMessage.addListener(msg => {
@@ -35,3 +33,5 @@ chrome.runtime.onConnect.addListener(port => {
         }
     });
 });
+
+chrome.runtime.sendMessage({ listening: true }); // let extension know that content script is listening for messages
