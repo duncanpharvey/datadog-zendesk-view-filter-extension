@@ -29,28 +29,46 @@ function observeViewUpdates() {
   });
 }
 
-// TODO: test if works correctly when views are added/removed
 function syncViews() {
   console.log("syncing views");
-  var internalId = 1; // used for sorting
+  var internalId = 1;
   chrome.storage.local.get(["views"], value => {
     const views = value.views;
+
+    // hide view in UI if not currently shown in Zendesk
+    Object.values(views).forEach(view => {
+      const id = view.id;
+      if (!document.querySelector(`[data-view-id="${id}"]`)) {
+        console.log(`hiding view: ${id} from extension UI`);
+        views[id].active = false;
+      }
+    });
+
     document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a').forEach(view => {
-      const id = view.getAttribute("href").match(/[^\/]+$/)[0];
-
-      const viewIds = new Set(Object.keys(views));
-      if (viewIds.has(id)) return;
-
+      const id = view.getAttribute("data-view-id");
       const title = view.firstElementChild.innerText;
 
-      views[id] = {
-        id: id,
-        internalId: internalId,
-        title: title,
-        displayed: view.style.display == "none" ? false : true, // find a way to exclude deleted differently. Also the display may be the only thing that shouldn't be resynced
-      };
+      const viewIds = new Set(Object.keys(views));
+      // update title and sort order if view is already in local storage
+      if (viewIds.has(id)) {
+        console.log(`view: ${id} already exists in local storage`);
+        views[id].internalId = internalId;
+        views[id].title = title;
+        views[id].active = true;
+      }
+      // add view if it is not already in local storage
+      else {
+        console.log(`adding view: ${id} to local storage`);
+        views[id] = {
+          id: id,
+          internalId: internalId, // used to sort views in extension UI in same order as in Zendesk
+          title: title,
+          displayed: true, // is the view currently toggled in the extension UI to be displayed
+          active: true // is the view currently shown in Zendesk
+        };
+      }
 
-      internalId++; // May need to move up so it's called each time. Reset internalId on each sync
+      internalId++;
     });
     chrome.storage.local.set({ views: views });
   });

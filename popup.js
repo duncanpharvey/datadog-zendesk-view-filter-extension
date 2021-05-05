@@ -15,7 +15,7 @@ function createExtensionUI() {
     viewHeaderWrapper.classList.add("view-header-wrapper");
     viewHeaderWrapper.innerHTML = `<div class="view-header">Select Zendesk views to hide</div><hr>`;
     viewContainer.appendChild(viewHeaderWrapper);
-    Object.values(views).sort((a, b) => { return a.internalId - b.internalId; })
+    Object.values(views).filter(view => { return view.active; }).sort((a, b) => { return a.internalId - b.internalId; })
       .forEach(view => {
         const viewTitle = `<div class="view-title-wrapper"><span class="view-title">${view.title}</span></div>`;
         const checkbox = `<div class="view-toggle-wrapper"><input id="view-${view.id}" view-id="${view.id}" type="checkbox" class="checkbox"><label for="view-${view.id}" class="toggle"></label></div>`;
