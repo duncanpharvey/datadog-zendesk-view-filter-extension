@@ -66,7 +66,6 @@ function createCheckboxEventListeners() {
 function sendMessage(viewId, action) {
   chrome.tabs.query({ url: "https://datadog.zendesk.com/agent/*" }, tabs => {
     tabs.forEach(tab => {
-      console.log("message");
       chrome.tabs.sendMessage(tab.id, { id: viewId, action: action });
     });
   });

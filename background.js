@@ -18,6 +18,11 @@ chrome.runtime.onInstalled.addListener(() => {
           target: { tabId: tab.id },
           files: ["listenForViewUpdates.js"],
         });
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tab.id },
+          files: ["syncViewState.js"],
+        });
     });
   });
 });
