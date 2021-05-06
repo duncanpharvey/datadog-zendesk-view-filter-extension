@@ -29,7 +29,6 @@ function createExtensionUI() {
         const viewTitle = `<div class="view-title-wrapper"><span class="view-title">${view.title}</span></div>`;
         const checkbox = `<div class="view-toggle-wrapper"><input id="view-${view.id}" view-id="${view.id}" type="checkbox" class="checkbox"><label for="view-${view.id}" class="toggle"></label></div>`;
         const viewWrapper = document.createElement("div");
-        viewWrapper.setAttribute("view-id", view.id);
         viewWrapper.classList.add("view-wrapper");
         viewWrapper.innerHTML = `${checkbox}${viewTitle}`;
         viewContainer.appendChild(viewWrapper);
