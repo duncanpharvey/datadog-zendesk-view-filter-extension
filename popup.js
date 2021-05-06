@@ -1,65 +1,45 @@
+// TODO: is there a better method using promises?
+var domLoaded = false;
+var synced = false;
+
 document.addEventListener("DOMContentLoaded", () => {
-  createLoadingAnimation();
-  openMessagePort();
+  domLoaded = true;
+  createExtensionUI();
 });
 
-function createLoadingAnimation() {
-  const loader = document.createElement("div");
-  loader.id = "loader";
-  loader.innerHTML = `<div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
-  document.body.appendChild(loader);
-}
+chrome.runtime.onMessage.addListener(msg => {
+  if (msg.synced) {
+    synced = true;
+  }
+  if (domLoaded && synced) {
+    createExtensionUI();
+  }
+});
 
-function createExtensionUI(port) {
-  document.body.removeChild(document.getElementById("loader"));
+function createExtensionUI() {
   chrome.storage.local.get(["views"], value => {
     const views = value.views;
     const viewContainer = document.getElementById("view-container");
-    const viewHeaderWrapper = document.createElement("div");
-    viewHeaderWrapper.classList.add("view-header-wrapper");
-    viewHeaderWrapper.innerHTML = `<div class="view-header">Select Zendesk views to hide</div><hr>`;
-    viewContainer.appendChild(viewHeaderWrapper);
-    if (Object.values(views).length == 0) {
-      document.getElementById("message-container").style.display = "block";
-      return;
-    }
+    // reset views if already loaded
+    document.querySelectorAll(".view-wrapper").forEach(viewWrapperElement => {
+      viewContainer.removeChild(viewWrapperElement);
+    });
     Object.values(views).filter(view => { return view.active; }).sort((a, b) => { return a.internalId - b.internalId; })
       .forEach(view => {
         const viewTitle = `<div class="view-title-wrapper"><span class="view-title">${view.title}</span></div>`;
         const checkbox = `<div class="view-toggle-wrapper"><input id="view-${view.id}" view-id="${view.id}" type="checkbox" class="checkbox"><label for="view-${view.id}" class="toggle"></label></div>`;
         const viewWrapper = document.createElement("div");
-        viewWrapper.innerHTML = `${checkbox}${viewTitle}`;
+        viewWrapper.setAttribute("view-id", view.id);
         viewWrapper.classList.add("view-wrapper");
+        viewWrapper.innerHTML = `${checkbox}${viewTitle}`;
         viewContainer.appendChild(viewWrapper);
         document.getElementById(`view-${view.id}`).checked = view.displayed;
       });
-    createCheckboxEventListeners(port);
+    createCheckboxEventListeners();
   });
 }
 
-// open port for current tab if Zendesk
-async function openMessagePort() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true, url: "https://datadog.zendesk.com/agent/*" });
-  if (!tab) {
-    createExtensionUI(null);
-  }
-  // wait for page to load if not loaded yet
-  else if (tab.status != "complete") {
-    chrome.runtime.onMessage.addListener(request => {
-      if (request.listening) {
-        port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-        createExtensionUI(port);
-      }
-    });
-  }
-  // open port if page is already loaded
-  else {
-    var port = chrome.tabs.connect(tab.id, { name: `connection for tab id: ${tab.id}` });
-    createExtensionUI(port);
-  }
-}
-
-function createCheckboxEventListeners(port) {
+function createCheckboxEventListeners() {
   document.querySelectorAll(".checkbox").forEach(checkbox => {
     checkbox.addEventListener("change", event => {
       const viewId = event.target.getAttribute("view-id");
@@ -72,14 +52,23 @@ function createCheckboxEventListeners(port) {
         if (checked && !displayed) {
           views[viewId].displayed = true;
           chrome.storage.local.set({ views: views });
-          if (port) port.postMessage({ id: viewId, action: "show" });
+          sendMessage(viewId, "show");
         }
         else if (!checked && displayed) {
           views[viewId].displayed = false;
           chrome.storage.local.set({ views: views });
-          if (port) port.postMessage({ id: viewId, action: "hide" });
+          sendMessage(viewId, "hide");
         }
       });
+    });
+  });
+}
+
+function sendMessage(viewId, action) {
+  chrome.tabs.query({ url: "https://datadog.zendesk.com/agent/*" }, tabs => {
+    tabs.forEach(tab => {
+      console.log("message");
+      chrome.tabs.sendMessage(tab.id, { id: viewId, action: action });
     });
   });
 }
