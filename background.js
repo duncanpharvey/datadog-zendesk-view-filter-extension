@@ -22,7 +22,7 @@ function syncTabs() {
       chrome.scripting.executeScript(
         {
           target: { tabId: tab.id },
-          files: ["listenForViewUpdates.js"],
+          files: ["syncViewState.js"],
         });
     });
   });
