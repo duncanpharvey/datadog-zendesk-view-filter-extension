@@ -1,18 +1,6 @@
 console.log("running syncViewState.js");
 
-createStyleElement();
 syncViewState();
-
-function createStyleElement() {
-    if (document.getElementById("extension-styles")) {
-        console.log("style element already exists");
-        return;
-    }
-    console.log("creating style element");
-    const styleElement = document.createElement("style");
-    styleElement.id = "extension-styles";
-    document.querySelector("head").append(styleElement);
-}
 
 function syncViewState() {
     console.log("syncing view states");
