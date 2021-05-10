@@ -1,6 +1,6 @@
 console.log("running syncViews.js");
 
-// call synchronously while observing for view updates
+// call synchronously while syncing views
 createStyleElement();
 syncViewStates();
 listenForViewUpdates();
@@ -120,7 +120,7 @@ async function syncViewStates() {
     const displayed = view.displayed;
     if (!displayed && !(viewsWithRule.has(id))) {
       console.log(`syncViewState: adding rule for view: ${id}`);
-      styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
+      styleElement.sheet.insertRule(`[data-view-id="${id}"] { display: none !important;}`);
     }
   });
 }
@@ -154,7 +154,7 @@ function listenForViewUpdates() {
         return;
       }
       console.log(`listenForViewUpdates: adding rule for view: ${id}`);
-      styleElement.sheet.insertRule(`[href$="${id}"] { display: none !important;}`);
+      styleElement.sheet.insertRule(`[data-view-id="${id}"] { display: none !important;}`);
     }
   });
 }

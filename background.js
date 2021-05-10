@@ -32,7 +32,6 @@ function setViews(views) {
       if (chrome.runtime.lastError) {
         return reject(chrome.runtime.lastError);
       }
-      console.log("created empty views object in storage");
       resolve();
     });
   });
