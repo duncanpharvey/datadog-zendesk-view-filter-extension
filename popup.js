@@ -1,25 +1,26 @@
-// TODO: is there a better method using promises?
 var domLoaded = false;
 var synced = false;
-var listening = false;
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   domLoaded = true;
-  console.log("creating extension UI");
-  await createExtensionUI();
-  console.log("creating checkbox event listeners");
-  await createCheckboxEventListeners();
+  init();
 });
 
-chrome.runtime.onMessage.addListener(async msg => {
+chrome.runtime.onMessage.addListener(msg => {
   if (msg.synced) {
     synced = true;
   }
   if (domLoaded && synced) {
-    await createExtensionUI();
-    await createCheckboxEventListeners();
+    init();
   }
 });
+
+async function init() {
+  console.log("creating extension UI");
+  await createExtensionUI();
+  console.log("creating checkbox event listeners");
+  await createCheckboxEventListeners();
+}
 
 async function createExtensionUI() {
   const views = await getViews();
