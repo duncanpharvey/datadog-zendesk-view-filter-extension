@@ -22,7 +22,7 @@ async function init() {
 
 function observeViewUpdates() {
   console.log("observing view updates");
-  var observer = new MutationObserver(async () => {
+  var observer = new MutationObserver(() => {
     var viewList = document.querySelectorAll('[data-test-id="views_views-list_general-views-container"] > a > [data-test-id="views_views-list_row_title"]');
     if (viewList.length >= 12) {
       console.log(`found ${viewList.length} views`);
