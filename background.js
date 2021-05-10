@@ -1,17 +1,20 @@
 // on extension installation initialize local view storage, get views from open Zendesk tabs, and listen for view updates
 chrome.runtime.onInstalled.addListener(async () => {
-  await getViews().then(async views => {
-    console.log("checking views");
-    // create views object if none exists
-    if (!views) {
-      console.log("no views found, initializing views in storage");
-      await initViews();
-    }
-  }).then(syncTabs);
+  console.log("getting views");
+  const views = await getViews();
+
+  console.log("checking views");
+  // create views object if none exists
+  if (!views) {
+    console.log("no views found, initializing views in storage");
+    await setViews({});
+  }
+
+  console.log("syncing tabs");
+  syncTabs();
 });
 
 function syncTabs() {
-  console.log("syncing tabs");
   chrome.tabs.query({ url: "https://datadog.zendesk.com/agent/*" }, tabs => {
     tabs.forEach(tab => {
       chrome.scripting.executeScript(
@@ -19,23 +22,18 @@ function syncTabs() {
           target: { tabId: tab.id },
           files: ["syncViews.js"],
         });
-      chrome.scripting.executeScript(
-        {
-          target: { tabId: tab.id },
-          files: ["syncViewState.js"],
-        });
     });
   });
 }
 
-function initViews() {
+function setViews(views) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.set({ views: {} }, () => {
+    chrome.storage.local.set({ views: views }, () => {
       if (chrome.runtime.lastError) {
         return reject(chrome.runtime.lastError);
       }
       console.log("created empty views object in storage");
-      resolve(true);
+      resolve();
     });
   });
 }
@@ -43,7 +41,6 @@ function initViews() {
 function getViews() {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get(["views"], value => {
-      console.log("getting views from storage");
       if (chrome.runtime.lastError) {
         return reject(chrome.runtime.lastError);
       }

@@ -29,8 +29,7 @@
       ],
       "run_at": "document_idle",
       "js": [
-        "syncViews.js",
-        "syncViewState.js"
+        "syncViews.js"
       ]
     }
   ]
